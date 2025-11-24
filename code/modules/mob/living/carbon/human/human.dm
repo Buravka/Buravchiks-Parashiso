@@ -132,6 +132,9 @@
 	regenerate_icons()
 	death()
 
+/mob/living/carbon/human/clockmachine/Initialize(mapload)
+	. = ..(mapload, /datum/species/machine/clockwork)
+
 /mob/living/carbon/human/shadow/Initialize(mapload)
 	. = ..(mapload, /datum/species/shadow)
 

@@ -285,6 +285,17 @@ GLOBAL_DATUM(basic_robolimb, /datum/robolimb)
 	// Only available for IPCs and at Chargen
 	species_allowed = list(SPECIES_MACNINEPERSON)
 
+//Ratvar Toiler
+/datum/robolimb/ratvar
+	company = "Ratvar Industries" //Making coggers since 2348
+	desc = "This is limb is made from brass. O NQN QXRTQXT XTG!."
+	icon = 'icons/mob/human_races/cyberlimbs/ratvar/ratvar.dmi'
+	selectable = FALSE
+	// This is debug type, existing only for proper creating of Toiler
+	species_allowed = list()
+
 #undef MODEL
 #undef BRAND
 #undef CHILDLESS
+
+

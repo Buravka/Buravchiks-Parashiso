@@ -1724,6 +1724,40 @@
 		new /obj/effect/mob_spawn/human/golem/clockwork(get_turf(golem))
 		golem.dust()
 
+/obj/item/clockwork/toiler_parts
+	name = "Inactive toiler"
+	desc = "Неактивные запчасти латунного робота труженика. На груди имеется открытая панель."
+	icon_state = "drone_inatcive"
+	force = 5
+	w_class = WEIGHT_CLASS_GIGANTIC
+
+/obj/item/clockwork/toiler_parts/attackby(obj/item/I, mob/living/user, params)
+	if(istype(I, /obj/item/mmi/robotic_brain/clockwork))
+		add_fingerprint(user)
+		if(!isclocker(user))
+			to_chat(user, span_danger("Cтоило вам только приложить вместилище души к отверстию на груди робота, как вас сразу же ударило мощным разрядом неизвестной энергии!"))
+			user.Confused(10 SECONDS)
+			user.Jitter(8 SECONDS)
+			return ATTACK_CHAIN_BLOCKED_ALL
+		if(isdrone(user))
+			to_chat(user, span_warning("Вы слишком маленькие для того, что-бы дотянуться до панели робота."))
+			return ATTACK_CHAIN_PROCEED
+		var/obj/item/mmi/robotic_brain/clockwork/soul = I
+		if(!soul.brainmob.mind)
+			to_chat(user, span_warning("в [I] нет души!"))
+			return ATTACK_CHAIN_PROCEED
+		if(!user.can_unEquip(src))
+			return ..()
+		if(!user.drop_transfer_item_to_loc(soul, src))
+			return ..()
+		var/mob/living/carbon/human/clockmachine/new_cogger = new(drop_location())
+		soul.brainmob.mind.transfer_to(new_cogger)
+		playsound(new_cogger, 'sound/effects/openclocks.ogg', 50)
+		qdel(soul)
+		qdel(src)
+		return ATTACK_CHAIN_BLOCKED_ALL
+	return ..()
+
 /obj/effect/temp_visual/ratvar/reconstruct
 	icon = 'icons/effects/96x96.dmi'
 	icon_state = "clockwork_gateway_active"
