@@ -2840,7 +2840,7 @@
 #include "code\modules\mob\living\carbon\human\update_stat.dm"
 #include "code\modules\mob\living\carbon\human\species\_species.dm"
 #include "code\modules\mob\living\carbon\human\species\abductor.dm"
-#include "code\modules\mob\living\carbon\human\species\clockwerk.dm"
+#include "code\modules\mob\living\carbon\human\species\clockwork.dm"
 #include "code\modules\mob\living\carbon\human\species\diona.dm"
 #include "code\modules\mob\living\carbon\human\species\drask.dm"
 #include "code\modules\mob\living\carbon\human\species\golem.dm"

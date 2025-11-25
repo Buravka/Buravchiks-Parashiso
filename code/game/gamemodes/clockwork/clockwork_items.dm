@@ -1752,6 +1752,10 @@
 			return ..()
 		var/mob/living/carbon/human/clockmachine/new_cogger = new(drop_location())
 		soul.brainmob.mind.transfer_to(new_cogger)
+		// Soul Vessels dosent have a magic action inbuild, because they are silicons,
+		// but toilers, as a humanoids, must have this action, so we will give it to them manually
+		var/datum/action/innate/clockwork/clock_magic/magic_action = new
+		magic_action.Grant(new_cogger)
 		playsound(new_cogger, 'sound/effects/openclocks.ogg', 50)
 		qdel(soul)
 		qdel(src)
