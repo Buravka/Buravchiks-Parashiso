@@ -95,7 +95,7 @@
 
 /datum/action/innate/ai/choose_modules/Trigger(mob/clicker, trigger_flags)
 	. = ..()
-	owner_AI.malf_picker.use(owner_AI)
+	owner_AI.malf_picker.ui_interact(clicker)
 
 /datum/action/innate/ai/return_to_core
 	name = "Return to Main Core"
@@ -115,9 +115,13 @@
 
 //The datum and interface for the malf unlock menu, which lets them choose actions to unlock.
 /datum/module_picker
-	var/temp
 	var/processing_time = 50
 	var/list/possible_modules
+
+/datum/module_picker/proc/can_afford_module(datum/AI_Module/module)
+	if(module.cost > processing_time)
+		return FALSE
+	return TRUE
 
 /datum/module_picker/New()
 	possible_modules = list()
@@ -126,85 +130,89 @@
 		if((AM.power_type && AM.power_type != /datum/action/innate/ai) || AM.upgrade)
 			possible_modules += AM
 
-/datum/module_picker/proc/use(mob/user)
-	var/dat = ""
-	dat += {"<b>Select use of processing time: (currently #[processing_time] left.)</b><br>
-			<hr>
-			<b>Install Module:</b><br>
-			<i>The number afterwards is the amount of processing time it consumes.</i><br>"}
-	for(var/datum/AI_Module/large/module in possible_modules)
-		dat += "<a href='byond://?src=[UID()];[module.mod_pick_name]=1'>[module.module_name]</a><a href='byond://?src=[UID()];showdesc=[module.mod_pick_name]'>\[?\]</a> ([module.cost])<br>"
-	for(var/datum/AI_Module/small/module in possible_modules)
-		dat += "<a href='byond://?src=[UID()];[module.mod_pick_name]=1'>[module.module_name]</a><a href='byond://?src=[UID()];showdesc=[module.mod_pick_name]'>\[?\]</a> ([module.cost])<br>"
-	dat += "<hr>"
-	if(temp)
-		dat += "[temp]"
-	var/datum/browser/popup = new(user, "modpicker", "Malf Module Menu", 400, 500)
-	popup.set_content(dat)
-	popup.open()
-	return
+/datum/module_picker/ui_interact(mob/user, datum/tgui/ui = null)
+	ui = SStgui.try_update_ui(user, src, ui)
+	if(!ui)
+		ui = new(user, src, "MalfPickerMenu", "Mеню Сбойных Модулей")
+		ui.set_autoupdate(TRUE)
+		ui.open()
 
-/datum/module_picker/Topic(href, href_list)
-	..()
+/datum/module_picker/ui_state(mob/user)
+	return GLOB.always_state
+
+/datum/module_picker/ui_data(mob/user)
+	var/list/data = list()
+	data["proccesing_time"] = processing_time
+	data["module"] = list()
+	for(var/datum/AI_Module/module in possible_modules)
+		var/list/module_data = list(
+			name = module.module_name,
+			uid = module.UID(),
+			desc = module.description,
+			cost = module.cost,
+			can_afford = can_afford_module(module),
+		)
+		data["module"] += list(module_data)
+	return data
+
+/datum/module_picker/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
+	if(..())
+		return FALSE
 
 	if(!isAI(usr))
-		return
-	var/mob/living/silicon/ai/A = usr
+		return FALSE
+	var/mob/living/silicon/ai/AI = usr
 
-	if(A.stat == DEAD)
-		to_chat(A, span_warning("You are already dead!"))
-		return
+	if(AI.stat == DEAD)
+		to_chat(AI, span_warning("К сожалению, вы мертвы"))
+		return FALSE
 
-	for(var/datum/AI_Module/AM in possible_modules)
-		if(href_list[AM.mod_pick_name])
-
+	switch(action)
+		if("install")
+			var/datum/AI_Module/module = locateUID(params["uid"])
 			// Cost check
-			if(AM.cost > processing_time)
-				temp = "You cannot afford this module."
-				break
+			if(!can_afford_module(module))
+				return FALSE
 
-			var/datum/action/innate/ai/action = locate(AM.power_type) in A.actions
+			var/datum/action/innate/ai/ai_action = locate(module.power_type) in AI.actions
 
 			// Give the power and take away the money.
-			if(AM.upgrade) //upgrade and upgrade() are separate, be careful!
-				AM.upgrade(A)
-				possible_modules -= AM
-				to_chat(A, AM.unlock_text)
-				A.playsound_local(A, AM.unlock_sound, 50, FALSE, use_reverb = FALSE)
-			else
-				if(AM.power_type)
-					if(!action) //Unlocking for the first time
-						var/datum/action/AC = new AM.power_type
-						AC.Grant(A)
-						A.current_modules += new AM.type
-						temp = AM.description
-						if(AM.one_purchase)
-							possible_modules -= AM
-						if(AM.unlock_text)
-							to_chat(A, AM.unlock_text)
-						if(AM.unlock_sound)
-							A.playsound_local(A, AM.unlock_sound, 50, FALSE, use_reverb = FALSE)
-					else //Adding uses to an existing module
-						action.uses += initial(action.uses)
-						action.desc = "[initial(action.desc)] It has [action.uses] use\s remaining."
-						action.UpdateButtonIcon()
-						temp = "Additional use[action.uses > 1 ? "s" : ""] added to [action.name]!"
-			processing_time -= AM.cost
+			if(module.upgrade) //upgrade and upgrade() are separate, be careful!
+				module.upgrade(AI)
+				possible_modules -= module
+				to_chat(AI, module.unlock_text)
+				AI.playsound_local(AI, module.unlock_sound, HALFWAY_SOUND_VOLUME, FALSE, use_reverb = FALSE)
+				processing_time -= module.cost
+				return TRUE
+			if(module.power_type)
+				if(!ai_action) //Unlocking for the first time
+					var/datum/action/AC = new module.power_type
+					AC.Grant(AI)
+					AI.current_modules += new module.type
+					processing_time -= module.cost
+					if(module.one_purchase)
+						possible_modules -= module
+					if(module.unlock_text)
+						to_chat(AI, module.unlock_text)
+					if(module.unlock_sound)
+						AI.playsound_local(AI, module.unlock_sound, 50, FALSE, use_reverb = FALSE)
+					return TRUE
+				else //Adding uses to an existing module
+					ai_action.uses += initial(ai_action.uses)
+					ai_action.desc = "[initial(ai_action.desc)] It has [ai_action.uses] use\s remaining."
+					ai_action.UpdateButtonIcon()
+					processing_time -= module.cost
+					return TRUE
 
-		if(href_list["showdesc"])
-			if(AM.mod_pick_name == href_list["showdesc"])
-				temp = AM.description
-	use(usr)
 
 //The base module type, which holds info about each ability.
 /datum/AI_Module
 	var/module_name
-	var/mod_pick_name
 	var/description = ""
 	var/engaged = 0
 	var/cost = 5
 	var/one_purchase = FALSE //If this module can only be purchased once. This always applies to upgrades, even if the variable is set to false.
-	var/power_type = /datum/action/innate/ai //If the module gives an active ability, use this. Mutually exclusive with upgrade.
+	var/datum/action/power_type = null //If the module gives an active ability, use this. Mutually exclusive with upgrade.
 	var/upgrade //If the module gives a passive upgrade, use this. Mutually exclusive with power_type.
 	var/unlock_text = span_notice_alt("Hello World!") //Text shown when an ability is unlocked
 	var/unlock_sound //Sound played when an ability is unlocked
@@ -220,7 +228,6 @@
 //Doomsday Device: Starts the self-destruct timer. It can only be stopped by killing the AI completely.
 /datum/AI_Module/large/nuke_station
 	module_name = "Doomsday Device"
-	mod_pick_name = "nukestation"
 	description = "Activate a weapon that will disintegrate all organic life on the station after a 450 second delay. Can only be used while on the station, will fail if your core is moved off station or destroyed."
 	cost = 130
 	one_purchase = TRUE
@@ -333,7 +340,6 @@
 //AI Turret Upgrade: Increases the health and damage of all turrets.
 /datum/AI_Module/large/upgrade_turrets
 	module_name = "AI Turret Upgrade"
-	mod_pick_name = "turret"
 	description = "Improves the power and health of all AI turrets. This effect is permanent."
 	cost = 30
 	upgrade = TRUE
@@ -351,7 +357,6 @@
 //Hostile Station Lockdown: Locks, bolts, and electrifies every airlock on the station. After 90 seconds, the doors reset.
 /datum/AI_Module/large/lockdown
 	module_name = "Hostile Station Lockdown"
-	mod_pick_name = "lockdown"
 	description = "Overload the airlock, blast door and fire control networks, locking them down. Caution! This command also electrifies all airlocks. The networks will automatically reset after 90 seconds, briefly \
 	opening all doors on the station."
 	cost = 30
@@ -372,7 +377,6 @@
 //Destroy RCDs: Detonates all non-cyborg RCDs on the station.
 /datum/AI_Module/large/destroy_rcd
 	module_name = "Destroy RCDs"
-	mod_pick_name = "rcd"
 	description = "Send a specialised pulse to detonate all hand-held and exosuit Rapid Construction Devices on the station."
 	cost = 25
 	one_purchase = TRUE
@@ -397,7 +401,6 @@
 //Unlock Mech Domination: Unlocks the ability to dominate mechs. Big shocker, right?
 /datum/AI_Module/large/mecha_domination
 	module_name = "Unlock Mech Domination"
-	mod_pick_name = "mechjack"
 	description = "Allows you to hack into a mech's onboard computer, shunting all processes into it and ejecting any occupants. Once uploaded to the mech, it is impossible to leave.\
 	Do not allow the mech to leave the station's vicinity or allow it to be destroyed."
 	cost = 30
@@ -411,7 +414,6 @@
 //Thermal Sensor Override: Unlocks the ability to disable all fire alarms from doing their job.
 /datum/AI_Module/large/break_fire_alarms
 	module_name = "Thermal Sensor Override"
-	mod_pick_name = "burnpigs"
 	description = "Gives you the ability to override the thermal sensors on all fire alarms. This will remove their ability to scan for fire and thus their ability to alert. \
 	Anyone can check the fire alarm's interface and may be tipped off by its status."
 	one_purchase = TRUE
@@ -436,7 +438,6 @@
 //Air Alarm Safety Override: Unlocks the ability to enable flooding on all air alarms.
 /datum/AI_Module/large/break_air_alarms
 	module_name = "Air Alarm Safety Override"
-	mod_pick_name = "allow_flooding"
 	description = "Gives you the ability to disable safeties on all air alarms. This will allow you to use the environmental mode Flood, which disables scrubbers as well as pressure checks on vents. \
 	Anyone can check the air alarm's interface and may be tipped off by their nonfunctionality."
 	one_purchase = TRUE
@@ -461,7 +462,6 @@
 //Overload Machine: Allows the AI to overload a machine, detonating it after a delay. Two uses per purchase.
 /datum/AI_Module/small/overload_machine
 	module_name = "Machine Overload"
-	mod_pick_name = "overload"
 	description = "Overheats an electrical machine, causing a small explosion and destroying it. Two uses per purchase."
 	cost = 20
 	power_type = /datum/action/innate/ai/ranged/overload_machine
@@ -515,7 +515,6 @@
 //Override Machine: Allows the AI to override a machine, animating it into an angry, living version of itself.
 /datum/AI_Module/small/override_machine
 	module_name = "Machine Override"
-	mod_pick_name = "override"
 	description = "Overrides a machine's programming, causing it to rise up and attack everyone except other machines. Four uses."
 	cost = 30
 	power_type = /datum/action/innate/ai/ranged/override_machine
@@ -567,7 +566,6 @@
 //Robotic Factory: Places a large machine that converts humans that go through it into cyborgs. Unlocking this ability removes shunting.
 /datum/AI_Module/large/place_cyborg_transformer
 	module_name = "Robotic Factory (Removes Shunting)"
-	mod_pick_name = "cyborgtransformer"
 	description = "Build a machine anywhere, using expensive nanomachines, that can convert a living human into a loyal cyborg slave when placed inside."
 	cost = 100
 	one_purchase = TRUE
@@ -641,7 +639,6 @@
 //Blackout: Overloads a random number of lights across the station. Three uses.
 /datum/AI_Module/small/blackout
 	module_name = "Blackout"
-	mod_pick_name = "blackout"
 	description = "Attempts to overload the lighting circuits on the station, destroying some bulbs. Three uses."
 	cost = 15
 	power_type = /datum/action/innate/ai/blackout
@@ -675,7 +672,6 @@
 //Reactivate Camera Network: Reactivates up to 30 cameras across the station.
 /datum/AI_Module/small/reactivate_cameras
 	module_name = "Reactivate Camera Network"
-	mod_pick_name = "recam"
 	description = "Runs a network-wide diagnostic on the camera network, resetting focus and re-routing power to failed cameras. Can be used to repair up to 30 cameras."
 	cost = 10
 	one_purchase = TRUE
@@ -715,7 +711,6 @@
 //Upgrade Camera Network: EMP-proofs all cameras, in addition to giving them X-ray vision.
 /datum/AI_Module/large/upgrade_cameras
 	module_name = "Upgrade Camera Network"
-	mod_pick_name = "upgradecam"
 	description = "Install broad-spectrum scanning and electrical redundancy firmware to the camera network, enabling EMP-proofing and light-amplified X-ray vision." //I <3 pointless technobabble
 	//This used to have motion sensing as well, but testing quickly revealed that giving it to the whole cameranet is PURE HORROR.
 	one_purchase = TRUE
@@ -748,7 +743,6 @@
 
 /datum/AI_Module/large/eavesdrop
 	module_name = "Enhanced Surveillance"
-	mod_pick_name = "eavesdrop"
 	description = "Via a combination of hidden microphones and lip reading software, you are able to use your cameras to listen in on conversations."
 	cost = 30
 	one_purchase = TRUE
@@ -762,7 +756,6 @@
 
 /datum/AI_Module/large/cameracrack
 	module_name = "Core Camera Cracker"
-	mod_pick_name = "cameracrack"
 	description = "By shortcirucuting the camera network chip, it overheats, preventing the camera console from using your internal camera."
 	cost = 10
 	one_purchase = TRUE
