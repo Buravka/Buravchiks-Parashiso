@@ -310,6 +310,15 @@
 
 	addtimer(CALLBACK(src, PROC_REF(update)), 5)
 
+	var/static/list/hovering_mob_typechecks = list(
+		/mob/living/silicon = list(
+			SCREENTIP_CONTEXT_ALT_LMB = "Вкл/выкл блокировку",
+			SCREENTIP_CONTEXT_CTRL_LMB = "Вкл/выкл питание",
+		)
+	)
+
+	AddElement(/datum/element/contextual_screentip_mob_typechecks, hovering_mob_typechecks)
+
 /obj/machinery/power/apc/examine(mob/user)
 	. = ..()
 	if(in_range(user, src))
@@ -613,8 +622,8 @@
 			return ATTACK_CHAIN_PROCEED
 		var/turf/host_turf = get_turf(src)
 		if(!host_turf)
-			throw EXCEPTION("attackby on APC when it's not on a turf")
-			return ATTACK_CHAIN_PROCEED
+			. = ATTACK_CHAIN_PROCEED
+			CRASH("attackby on APC when it's not on a turf")
 		if(!host_turf.can_have_cabling() || host_turf.intact)
 			to_chat(user, span_warning("You should remove the floor plating in front of the APC first."))
 			return ATTACK_CHAIN_PROCEED

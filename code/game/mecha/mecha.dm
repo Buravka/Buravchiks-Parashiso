@@ -1195,6 +1195,7 @@
 			AI.forceMove(card)
 			occupant = null
 			AI.controlled_mech = null
+			AI.require_power = TRUE
 			AI.remote_control = null
 			update_icon(UPDATE_ICON_STATE)
 			to_chat(AI, span_notice("You have been downloaded to a mobile storage device. Wireless connection offline."))
@@ -1240,6 +1241,7 @@
 	AI.eyeobj?.forceMove(src)
 	AI.eyeobj?.RegisterSignal(src, COMSIG_MOVABLE_MOVED, TYPE_PROC_REF(/mob/camera/aiEye, update_visibility))
 	AI.controlled_mech = src
+	AI.require_power = FALSE
 	AI.remote_control = src
 	AI.can_shunt = FALSE //ONE AI ENTERS. NO AI LEAVES.
 	to_chat(AI, "[AI.can_dominate_mechs ? span_boldnotice("Takeover of [name] complete! You are now permanently loaded onto the onboard computer. Do not attempt to leave the station sector!") \
@@ -1520,6 +1522,7 @@
 
 			to_chat(AI, span_notice("Returning to core..."))
 			AI.controlled_mech = null
+			AI.require_power = TRUE
 			AI.remote_control = null
 			RemoveActions(occupant, 1)
 			mob_container = AI
@@ -1854,11 +1857,11 @@
 /obj/mecha/on_changed_z_level(turf/old_turf, turf/new_turf, same_z_layer, notify_contents)
 	. = ..()
 
-	if(!phasing || is_teleport_allowed(new_turf.z))
+	if(!new_turf || !phasing || is_teleport_allowed(new_turf.z))
 		return
 
 	phasing = FALSE
-	occupant_message("<font color='#f00'>Phasing is malfunctioning.</font>")
+	occupant_message(span_warning("Phasing is malfunctioning."))
 
 	if(!phasing_action.owner)
 		return

@@ -91,6 +91,9 @@
 	///a list of objectives that a player with this job could complete for space credit rewards
 	var/list/job_objectives = list()
 
+	///Owned cyborg skin permissions
+	var/list/cyborg_skin_permissions = list()
+
 /datum/mind/New(new_key)
 	key = new_key
 	soulOwner = src
@@ -1243,8 +1246,7 @@
 
 				var/datum/mind/targ = new_target
 				if(!istype(targ))
-					log_runtime(EXCEPTION("Invalid target for identity theft objective, cancelling"), src)
-					return
+					CRASH("Invalid target for identity theft objective, cancelling")
 
 				var/datum/objective/escape/escape_with_identity/identity_objective = new
 				identity_objective.owner = src
