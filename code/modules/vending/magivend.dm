@@ -27,21 +27,60 @@
 	all_products_free = TRUE
 
 	products = list(
+		// MARK: ROBES START
+
+		/// STANDART
 		/obj/item/clothing/head/wizard = 5,
 		/obj/item/clothing/suit/wizrobe = 5,
+		/// RED
 		/obj/item/clothing/head/wizard/red = 5,
 		/obj/item/clothing/suit/wizrobe/red = 5,
-		/obj/item/clothing/shoes/sandal = 5,
+		/// CLOWN
 		/obj/item/clothing/suit/wizrobe/clown = 5,
 		/obj/item/clothing/head/wizard/clown = 5,
 		/obj/item/clothing/mask/gas/clownwiz = 5,
 		/obj/item/clothing/shoes/clown_shoes/magical = 5,
+		/// MIME
 		/obj/item/clothing/suit/wizrobe/mime = 5,
 		/obj/item/clothing/head/wizard/mime = 5,
 		/obj/item/clothing/mask/gas/mime/wizard = 5,
+		/// MARISA
 		/obj/item/clothing/head/wizard/marisa = 5,
 		/obj/item/clothing/suit/wizrobe/marisa = 5,
 		/obj/item/clothing/shoes/sandal/marisa = 5,
+		/// NECROMAGE
+		/obj/item/clothing/head/wizard/necromage = 5,
+		/obj/item/clothing/suit/wizrobe/necromage = 5,
+		/// ARTMAGE
+		/obj/item/clothing/head/wizard/artmage = 5,
+		/obj/item/clothing/suit/wizrobe/artmage = 5,
+		/// VISIONMAGE
+		/obj/item/clothing/head/wizard/visionmage = 5,
+		/obj/item/clothing/suit/wizrobe/visionmage = 5,
+		/// HEALMAGE
+		/obj/item/clothing/head/wizard/healmage = 5,
+		/obj/item/clothing/suit/wizrobe/healmage = 5,
+		/// PSYMAGE
+		/obj/item/clothing/head/wizard/amp = 5,
+		/obj/item/clothing/suit/wizrobe/psypurple = 5,
+		/// SABOTEUR
+		/obj/item/clothing/head/fedora/head/saboteur = 5,
+		/obj/item/clothing/suit/storage/blacktrenchcoat/suit/saboteur = 5,
+		/// GUARDIAN
+		/obj/item/clothing/head/wizard/magusdefender = 5,
+		/obj/item/clothing/suit/wizrobe/magusdefender = 5,
+		/// SINGULOTH
+		/obj/item/clothing/head/wizard/magus/singulo = 5,
+		/obj/item/clothing/suit/wizrobe/singulo = 5,
+		/// BLOODMAGE
+		/obj/item/clothing/suit/hooded/cultrobes/suit/sacrificial_robe = 5,
+		/// ASHMAGE
+		/obj/item/clothing/under/ash_walker = 5,
+		/obj/item/clothing/suit/hooded/goliath/wizard = 5,
+
+		// MARK: ROBES OVER
+
+		/obj/item/clothing/shoes/sandal = 5,
 		/obj/item/twohanded/staff/broom = 5,
 		/obj/item/clothing/head/wizard/black = 5,
 		/obj/item/clothing/head/wizard/fluff/dreamy = 5,

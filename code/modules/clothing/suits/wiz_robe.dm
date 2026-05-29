@@ -76,6 +76,12 @@
 	dog_fashion = null
 	flags_cover = HEADCOVERSMOUTH|HEADCOVERSEYES
 
+/obj/item/clothing/head/wizard/magus/singulo
+	name = "Singuloth Helm"
+	desc = "Древний шлем последователя школы сингулярности."
+	icon_state = "hardsuit0-singuloth"
+	item_state = "singuloth_helm"
+
 /obj/item/clothing/head/wizard/magusdefender
 	name = "Magus Helm"
 	desc = "A mysterious helmet that hums with an unearthly power"
@@ -226,6 +232,16 @@
 		SPECIES_ASHWALKER_SHAMAN = 'icons/mob/clothing/species/unathi/suit.dmi',
 		SPECIES_DRACONOID = 'icons/mob/clothing/species/unathi/suit.dmi',
 		SPECIES_UNATHI = 'icons/mob/clothing/species/unathi/suit.dmi',
+	)
+
+/obj/item/clothing/suit/wizrobe/singulo
+	name = "Singuloth Robe"
+	desc = "Древняя броня последователя школы сингулярности."
+	icon_state = "hardsuit-singuloth"
+	item_state = "singuloth_hardsuit"
+	sprite_sheets = list(
+		SPECIES_VOX = 'icons/mob/clothing/species/vox/suit.dmi',
+		SPECIES_DRASK = 'icons/mob/clothing/species/drask/suit.dmi',
 	)
 
 /obj/item/clothing/suit/wizrobe/magusdefender

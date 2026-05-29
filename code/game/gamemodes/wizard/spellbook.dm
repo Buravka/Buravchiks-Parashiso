@@ -676,7 +676,7 @@
 /datum/spellbook_entry/item/contract
 	name = "Contract of Apprenticeship"
 	desc = "A magical contract binding an apprentice wizard to your service, using it will summon them to your side."
-	item_path = /obj/item/contract/apprentice
+	item_path = /obj/item/apprentice_contract
 	category = "Summons"
 
 /datum/spellbook_entry/item/tarotdeck
@@ -762,6 +762,8 @@
 	var/static/list/spell_categories = list("Offensive", "Defensive", "Mobility", "Assistance", "Rituals")
 	var/static/list/item_categories = list("Artefacts", "Spell books", "Weapons and Armors", "Staves", "Summons")
 	var/static/list/loadout_categories = list("Standard", "Unique")
+	/// If TRUE, spellbook will allow apperentices to buy spells
+	var/allow_apperentices = FALSE
 
 /obj/item/spellbook/get_ru_names()
 	return list(
@@ -807,12 +809,8 @@
 	if(user.a_intent == INTENT_HARM || skip_refunds)
 		return ..()
 
-	if(istype(I, /obj/item/contract/apprentice))
+	if(istype(I, /obj/item/apprentice_contract))
 		add_fingerprint(user)
-		var/obj/item/contract/apprentice/contract = I
-		if(contract.used)
-			to_chat(user, span_warning("The contract has been used, you can't get your points back now!"))
-			return ATTACK_CHAIN_PROCEED
 		to_chat(user, span_notice("You feed the contract back into the spellbook, refunding your points."))
 		uses += 2
 		qdel(I)
@@ -874,7 +872,7 @@
 	if(user != owner)
 		to_chat(user, span_warning("The [name] does not recognize you as it's owner and refuses to open!"))
 		return
-	
+
 	ui_interact(user)
 
 
@@ -942,7 +940,7 @@
 	if(!ishuman(user) || !owner || user != owner)
 		return
 
-	if(user.mind && user.mind.special_role == SPECIAL_ROLE_WIZARD_APPRENTICE)
+	if(user.mind && user.mind.special_role == SPECIAL_ROLE_WIZARD_APPRENTICE && !allow_apperentices)
 		to_chat(user, span_warning("If you got caught sneaking a peak from your teacher's spellbook, you'd likely be expelled from the Wizard Academy. Better not."))
 		return
 
@@ -975,7 +973,28 @@
 				entry.limit += result
 			uses += result
 			. = TRUE
-			
+
+// MARK: BLOCK 2.4: APPRENTICE SPELLBOOK
+/obj/item/spellbook/apprentice
+	name = "spell summary"
+	desc = "Потрепанная тетрадка с кучей пометок, вся исписанная какими-то странными рунами. По всей видимости, она предналежала какому-то очень занятому студенту."
+	gender = MALE
+	icon_state = "book1"
+	item_state = "book1"
+	uses = 5
+
+	allow_apperentices = TRUE
+
+/obj/item/spellbook/apprentice/get_ru_names()
+	return list(
+		NOMINATIVE = "конспект заклинаний",
+		GENITIVE = "конспекта заклинаний",
+		DATIVE = "конспекту заклинаний",
+		ACCUSATIVE = "конспект заклинаний",
+		INSTRUMENTAL = "конспектом заклинаний",
+		PREPOSITIONAL = "конспекте заклинаний",
+	)
+
 #undef SPELLBOOK_ACTION_BUY
 #undef SPELLBOOK_ACTION_REFUND
 
