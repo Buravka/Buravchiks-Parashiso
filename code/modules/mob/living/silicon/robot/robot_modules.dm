@@ -104,15 +104,20 @@
 /// Installs default set of upgrades, that every ERT-borg must have. Also used by ninjaborg
 /obj/item/robot_module/proc/install_ert_upgrades(mob/living/silicon/robot/robot)
 	var/obj/item/borg/upgrade/vtec/vtec = new(robot)
-	robot.install_upgrade(vtec)
+	if(!robot.install_upgrade(vtec))
+		qdel(vtec)
 	var/obj/item/borg/upgrade/magboots/magboots = new(robot)
-	robot.install_upgrade(magboots)
+	if(!robot.install_upgrade(magboots))
+		qdel(magboots)
 	var/obj/item/borg/upgrade/selfrepair/selfrepair = new(robot)
-	robot.install_upgrade(selfrepair)
+	if(!robot.install_upgrade(selfrepair))
+		qdel(selfrepair)
 	var/obj/item/borg/upgrade/thrusters/thrusters = new(robot)
-	robot.install_upgrade(thrusters)
+	if(!robot.install_upgrade(thrusters))
+		qdel(thrusters)
 	var/obj/item/borg/upgrade/mounted_seat/mounted_seat = new(robot)
-	robot.install_upgrade(mounted_seat)
+	if(!robot.install_upgrade(mounted_seat))
+		qdel(mounted_seat)
 
 /obj/item/robot_module/proc/add_languages(mob/living/silicon/robot/R)
 	//full set of languages
@@ -526,13 +531,6 @@
 
 /obj/item/robot_module/security/ert/on_apply(mob/living/silicon/robot/robot)
 
-	modules += new /obj/item/weldingtool/mini(src)
-	modules += new /obj/item/stack/cable_coil/cyborg(src)
-
-	rebuild()
-	fix_modules()
-	handle_storages()
-
 	robot.weapons_unlock = TRUE
 	install_ert_upgrades(robot)
 	var/obj/item/borg/upgrade/disablercooler/disablercooler = new(robot)
@@ -541,12 +539,11 @@
 	return TRUE
 
 /obj/item/robot_module/security/ert/Destroy()
+	. = ..()
 	if(!isrobot(loc))
 		return
 	var/mob/living/silicon/robot/robot = loc
 	robot.weapons_unlock = initial(robot.weapons_unlock)
-	..()
-
 
 /obj/item/robot_module/janitor
 	name = "Janitor"
@@ -776,7 +773,6 @@
 	modules += new /obj/item/pickaxe/drill/cyborg(src)
 	modules += new /obj/item/shovel(src)
 	modules += new /obj/item/weldingtool/mini(src)
-	modules += new /obj/item/stack/cable_coil/cyborg(src)
 	modules += new /obj/item/extinguisher/mini(src)
 	modules += new /obj/item/storage/bag/sheetsnatcher/borg(src)
 	modules += new /obj/item/t_scanner/adv_mining_scanner/cyborg(src)
@@ -785,7 +781,6 @@
 	emag = new /obj/item/storage/bag/kaboom/cyborg(src)
 
 	fix_modules()
-	handle_storages()
 
 // Replace their normal drill with a diamond drill.
 /obj/item/robot_module/miner/emag_act()
@@ -843,12 +838,9 @@
 	modules += new /obj/item/crowbar(src)
 	modules += new /obj/item/gripper/nuclear(src)
 	modules += new /obj/item/pinpointer(src)
-	modules += new /obj/item/weldingtool/mini(src)
-	modules += new /obj/item/stack/cable_coil/cyborg(src)
 	emag = new /obj/item/gun/energy/pulse/destroyer/annihilator(src)
 
 	fix_modules()
-	handle_storages()
 
 /obj/item/robot_module/syndicate
 	name = "Syndicate Bloodhound"
@@ -882,12 +874,9 @@
 	modules += new /obj/item/pinpointer/operative(src)
 	modules += new /obj/item/pinpointer/nukeop(src)
 	modules += new /obj/item/gripper/nuclear(src)
-	modules += new /obj/item/weldingtool/mini(src)
-	modules += new /obj/item/stack/cable_coil/cyborg(src)
 	emag = null
 
 	fix_modules()
-	handle_storages()
 
 /obj/item/robot_module/syndicate_medical
 	name = "Syndicate Medical"
@@ -1034,12 +1023,9 @@
 	modules += new /obj/item/crowbar/cyborg(src)
 	modules += new /obj/item/gripper/nuclear(src)
 	modules += new /obj/item/pinpointer(src)
-	modules += new /obj/item/weldingtool/mini(src)
-	modules += new /obj/item/stack/cable_coil/cyborg(src)
 	emag = new /obj/item/gun/energy/pulse/destroyer/annihilator(src)
 
 	fix_modules()
-	handle_storages()
 
 /obj/item/robot_module/combat
 	name = "Combat"
@@ -1078,12 +1064,9 @@
 	modules += new /obj/item/crowbar/cyborg(src)
 	modules += new /obj/item/gripper/nuclear(src)
 	modules += new /obj/item/pinpointer(src)
-	modules += new /obj/item/weldingtool/mini(src)
-	modules += new /obj/item/stack/cable_coil/cyborg(src)
 	emag = null
 
 	fix_modules()
-	handle_storages()
 
 /obj/item/robot_module/hunter
 	name = "Hunter"

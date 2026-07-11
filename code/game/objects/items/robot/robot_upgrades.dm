@@ -563,12 +563,12 @@
 
 	if(cyborg && (cyborg.stat != DEAD) && on)
 		if(!cyborg.cell)
-			balloon_alert(src, "саморемонт остановлен")
+			balloon_alert(cyborg, "саморемонт остановлен")
 			deactivate_sr()
 			return
 
 		if(cyborg.cell.charge < powercost * 2)
-			balloon_alert(src, "недостаточно энергии для саморемонта")
+			balloon_alert(cyborg, "недостаточно энергии для саморемонта")
 			deactivate_sr()
 			return
 
@@ -587,11 +587,11 @@
 
 		if((world.time - 2000) > msg_cooldown)
 			if(cyborg.health < 0)
-				balloon_alert(src, "саморемонт в интенсивном режиме")
+				balloon_alert(cyborg, "саморемонт в интенсивном режиме")
 			else if(cyborg.health < cyborg.maxHealth)
-				balloon_alert(src, "саморемонт в обычном режиме")
+				balloon_alert(cyborg, "саморемонт в обычном режиме")
 			else
-				balloon_alert(src, "саморемонт в спящем режиме")
+				balloon_alert(cyborg, "саморемонт в спящем режиме")
 			msg_cooldown = world.time
 	else
 		deactivate_sr()

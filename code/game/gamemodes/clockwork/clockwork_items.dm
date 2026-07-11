@@ -1267,8 +1267,8 @@
 	if(!vtec_upgrade)
 		vtec_upgrade = new
 		if(!robot.install_upgrade(vtec_upgrade, user))
-			return
-		qdel(vtec_upgrade)
+			qdel(vtec_upgrade)
+			return .
 
 // A drone shell. Just click on it and it will boot up itself!
 /obj/item/clockwork/cogscarab

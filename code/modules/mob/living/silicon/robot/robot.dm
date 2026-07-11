@@ -1,5 +1,4 @@
 #define BORG_LAMP_CD_RESET 10 SECONDS
-#define BORG_BASE_SELFREPAIR_DELAY 2 SECONDS
 
 #define BORG_BASE_MAINTPANEL_OPEN_DELAY 2.5 SECONDS
 #define BORG_BASE_INNERPANEL_OPEN_DELAY 1 SECONDS
@@ -790,11 +789,8 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 	if(user.a_intent == INTENT_HARM)	// no interactions in combat
 		return ..()
 
-	/// Borg-player is clicking on himself
-	var/selfattack = FALSE
-
 	if(user == src)
-		selfattack = TRUE
+		return ..()
 
 	// Check if the user is trying to insert another component like a radio, actuator, armor etc.
 	if(istype(I, /obj/item/robot_parts/robot_component))
@@ -842,15 +838,9 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 			SEND_SOUND(user, 'sound/machines/buzz-two.ogg')
 			return ATTACK_CHAIN_PROCEED
 
-		if(selfattack)
-			if(!do_after(src, 2 SECONDS, src))
-				return ATTACK_CHAIN_BLOCKED_ALL
-			heal_overall_damage(burn = 30)
+		heal_overall_damage(burn = 30)
 
-		else
-			heal_overall_damage(burn = 30)
-
-		balloon_alert_to_viewers("проводка заменена", "[selfattack ? "cаморемонт окончен" : "вашу проводку заменили"]")
+		balloon_alert_to_viewers("проводка заменена", "вашу проводку заменили")
 		return ATTACK_CHAIN_PROCEED_SUCCESS
 
 	if(iscell(I))	// trying to put a cell inside
@@ -861,7 +851,7 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 			return ATTACK_CHAIN_PROCEED
 
 		if(wiresexposed)
-			balloon_alert(user, "внутреннея панель открыта")
+			balloon_alert(user, "внутрення панель открыта")
 			SEND_SOUND(user, 'sound/machines/buzz-two.ogg')
 			return ATTACK_CHAIN_PROCEED
 
@@ -1136,10 +1126,9 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 /mob/living/silicon/robot/welder_act(mob/user, obj/item/I)
 	if(user.a_intent == INTENT_HARM)	// no interactions in combat
 		return FALSE
-	var/selfattack = FALSE
 
 	if(user == src)
-		selfattack = TRUE
+		return FALSE
 
 	. = TRUE
 	if(!getBruteLoss())
@@ -1156,14 +1145,9 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 	if(!I.use_tool(src, user, volume = I.tool_volume))
 		return .
 
-	if(selfattack)
-		if(!do_after(src, BORG_BASE_SELFREPAIR_DELAY, src))
-			return ATTACK_CHAIN_BLOCKED_ALL
-		heal_overall_damage(brute = 30)
-	else
-		heal_overall_damage(brute = 30)
+	heal_overall_damage(brute = 30)
 
-	balloon_alert_to_viewers("корпус отремонтирован", "[selfattack ? "cаморемонт окончен" : "вас отремонтировали"]")
+	balloon_alert_to_viewers("корпус отремонтирован", "вас отремонтировали")
 
 /mob/living/silicon/robot/proceed_attack_results(obj/item/I, mob/living/user, params, def_zone)
 	. = ..()
@@ -1179,10 +1163,15 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 		if(isrobot(user))
 			return
 		to_chat(user, span_danger("Вы попытались провести криптографическим секвенсором по адаптеру [src], но он просто вылетел из ваших рук, движемый неизвестной и невероятно мощной магией."))
-		var/obj/item/item = user.get_active_hand()
-		user.drop_from_active_hand(TRUE, TRUE)
-		var/turf/destination = get_edge_target_turf(src, ~user.dir)
-		item.throw_at(destination, 10, 5, user)
+		if(!iscarbon(user))
+			return
+		var/mob/living/carbon/carbon = user
+		var/obj/item/item = carbon.get_active_hand()
+		if(!item)
+			return
+		if(carbon.drop_item_ground(item))
+			var/turf/destination = get_edge_target_turf(src, ~user.dir)
+			item.throw_at(destination, 10, 5, user)
 		return
 
 	var/mob/living/M = user
@@ -1939,6 +1928,7 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 	brute_mod = 0.5 // Bullets are dealing 50%+5 less damage. Full line of shotgun slugs now won't kill the cyborg(but cyborg will lose 2 modules and armor planting)
 	burn_mod = 0.5 // Interesting. Deathsquad cyborg can reflect laser projectiles, however still reduces samage from explosives, and grants ability to tanl more than one SRM8 rocket.
 	emp_protection = TRUE // This is a deathsquad cyborg. Why an ion gun can stop this killing machine?
+	reflectable = TRUE
 	allow_rename = FALSE
 	modtype = /obj/item/robot_module/deathsquad
 	faction = list("nanotrasen")
@@ -1955,14 +1945,6 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 	radio = new /obj/item/radio/borg/deathsquad(src)
 	radio.recalculate_channels()
 	playsound(loc, 'sound/mecha/nominalsyndi.ogg', 75, FALSE)
-
-/mob/living/silicon/robot/deathsquad/bullet_act(obj/projectile/P)
-	if(istype(P) && P.is_reflectable(REFLECTABILITY_ENERGY) && P.starting)
-		balloon_alert_to_viewers("снаряд отражен")
-		P.reflect_back(src)
-		return -1
-
-	return ..(P)
 
 /mob/living/silicon/robot/ert
 	designation = "ERT"
@@ -2388,7 +2370,8 @@ GLOBAL_LIST_INIT(robot_verbs_default, list(
 		return
 
 #undef BORG_LAMP_CD_RESET
-#undef BORG_BASE_SELFREPAIR_DELAY
+#undef BORG_BASE_MAINTPANEL_OPEN_DELAY
+#undef BORG_BASE_INNERPANEL_OPEN_DELAY
 
 /mob/living/silicon/robot/vv_edit_var(var_name, var_value)
 	if(!check_rights(R_SKINS) && (var_name in list("icon", "icon_state")))
