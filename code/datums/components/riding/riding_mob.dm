@@ -288,14 +288,15 @@
 	return ..()
 
 /datum/component/riding/creature/cyborg/post_vehicle_mob_buckle(atom/movable/ridden, atom/movable/rider)
-	// Cyborgs seats have advanced safety system, so crew wont fall off and hurt themselves
+	// Cyborgs seats have advanced safety system, so crew won't fall off and hurt themselves
 	ADD_TRAIT(rider, TRAIT_FORCED_STANDING, UNIQUE_TRAIT_SOURCE(src))
 
 /datum/component/riding/creature/cyborg/handle_unbuckle(mob/living/rider)
-	. = ..()
 	REMOVE_TRAIT(rider, TRAIT_FORCED_STANDING, UNIQUE_TRAIT_SOURCE(src))
+	..()
 	// For some reason, after unbuckling, game is substracting atom's 'pixel_y' var by 9.
 	rider.pixel_y += 9
+	return
 
 /datum/component/riding/creature/cyborg/get_offsets(pass_index)
 	var/mob/living/silicon/robot/robot = parent
