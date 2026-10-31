@@ -23,7 +23,13 @@
 /*-------TODOOOOOOOOOO--------*/
 /mob/living/silicon/robot/proc/uneq_module(obj/item/O)
 	if(!O)
-		return 0
+		return FALSE
+	if(istype(O, /obj/item/gripper))
+		var/obj/item/gripper/gripper = O
+		if(gripper?.gripped_item?.w_class > WEIGHT_CLASS_SMALL)
+			to_chat(src, span_warningbig("Предмет в вашем манипуляторе слишком большой, для того, чтобы вы могли сложить его обратно в свой корпус. Вам придется выбросить его."))
+			SEND_SOUND(src, 'sound/machines/buzz-two.ogg')
+			return FALSE
 
 	O.dropped(src)
 	O.mouse_opacity = MOUSE_OPACITY_OPAQUE

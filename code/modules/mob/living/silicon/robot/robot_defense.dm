@@ -47,8 +47,25 @@
 
 	return .
 
+/// returns a gripper, if cyborg helds any
+/mob/living/silicon/robot/proc/find_gripper()
+	if(istype(module_state_1, /obj/item/gripper))
+		return module_state_1
+	if(istype(module_state_2, /obj/item/gripper))
+		return module_state_2
+	if(istype(module_state_3, /obj/item/gripper))
+		return module_state_3
+
 /mob/living/silicon/robot/attack_hand(mob/living/carbon/human/user)
 	add_fingerprint(user)
+
+	if(user.a_intent == INTENT_DISARM)
+		var/obj/item/gripper/gripper = find_gripper()
+		if(gripper.gripped_item)
+			var/obj/item/gripped_item = gripper.gripped_item
+			gripper.drop_gripped_item(forced = TRUE)
+			if(user.put_in_active_hand(gripped_item))
+				return
 
 	if(opened && !wiresexposed && !issilicon(user))
 		if(cell)

@@ -49,6 +49,7 @@
 // By default, all robots will get the items in this proc, unless you override it for your specific module. See: ../robot_module/drone
 /obj/item/robot_module/proc/add_default_robot_items()
 	modules += new /obj/item/flash/cyborg(src)
+	modules += new /obj/item/gripper(src)
 
 /obj/item/robot_module/proc/on_apply(mob/living/silicon/robot/robot)
 	return TRUE
@@ -215,7 +216,6 @@
 	modules += new /obj/item/weldingtool(src) //added instead of upgraded version
 	modules += new /obj/item/melee/baton/telescopic(src) // for minimal possablity to execute sec part of the module and also for tests
 	modules += new /obj/item/restraints/handcuffs/cable/zipties(src)
-	modules += new /obj/item/flash/cyborg(src)
 	modules += new /obj/item/reagent_containers/spray/cleaner(src) // test if will be in active usage and become op to be cutted out later
 	modules += new /obj/item/soap/nanotrasen(src)
 	modules += new /obj/item/stack/sheet/metal/cyborg(src)
@@ -238,9 +238,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/standard/add_default_robot_items()
-	return
 
 /obj/item/robot_module/standard/respawn_consumable(mob/living/silicon/robot/R)
 	var/obj/item/reagent_containers/spray/cleaner/cleaner = locate() in modules
@@ -303,8 +300,6 @@
 	modules += new /obj/item/reagent_containers/borghypo(src)
 	modules += new /obj/item/handheld_defibrillator(src)
 	modules += new /obj/item/twohanded/shockpaddles/borg(src)
-	modules += new /obj/item/gripper/medical(src)
-	modules += new /obj/item/flash/cyborg(src)
 	modules += new /obj/item/scalpel/laser/laser1(src)
 	modules += new /obj/item/hemostat(src)
 	modules += new /obj/item/retractor(src)
@@ -345,9 +340,6 @@
 		defib.emag_act()
 
 	return ..()
-
-/obj/item/robot_module/medical/add_default_robot_items()
-	return
 
 /obj/item/robot_module/medical/ert
 	name = "Combat Medical"
@@ -935,8 +927,6 @@
 	modules += new /obj/item/gun/medbeam(src)
 	modules += new /obj/item/handheld_defibrillator(src)
 	modules += new /obj/item/twohanded/shockpaddles/borg(src)
-	modules += new /obj/item/gripper/medical(src)
-	modules += new /obj/item/flash/cyborg(src)
 	modules += new /obj/item/scalpel/laser/laser1(src)
 	modules += new /obj/item/hemostat(src)
 	modules += new /obj/item/retractor(src)
@@ -961,9 +951,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/syndicate_medical/add_default_robot_items()
-	return
 
 /obj/item/robot_module/syndicate_saboteur
 	name = "Syndicate Saboteur"
@@ -995,8 +982,6 @@
 	modules += new /obj/item/wrench/cyborg(src)
 	modules += new /obj/item/weldingtool/largetank/cyborg(src)
 	modules += new /obj/item/multitool/cyborg(src)
-	modules += new /obj/item/gripper(src)
-	modules += new /obj/item/flash/cyborg(src)
 	modules += new /obj/item/rcd/borg/syndicate(src)
 	modules += new /obj/item/rpd(src)
 	modules += new /obj/item/t_scanner(src)
@@ -1019,9 +1004,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/syndicate_saboteur/add_default_robot_items()
-	return
 
 /obj/item/robot_module/destroyer
 	name = "Destroyer"
@@ -1107,13 +1089,9 @@
 	robot.modtype = /obj/item/robot_module/hunter
 	return TRUE
 
-/obj/item/robot_module/hunter/add_default_robot_items()
-	return
-
 /obj/item/robot_module/hunter/Initialize(mapload)
 	. = ..()
 	modules += new /obj/item/melee/energy/alien_claws(src)
-	modules += new /obj/item/flash/cyborg/alien(src)
 	modules += new /obj/item/reagent_containers/spray/alien/smoke(src)
 	modules += new /obj/item/reagent_containers/spray/alien/stun(src)
 	emag = new /obj/item/reagent_containers/spray/alien/acid(src)
@@ -1149,7 +1127,6 @@
 	modules += new /obj/item/wrench/cyborg(src)
 	modules += new /obj/item/weldingtool/largetank/cyborg(src)
 	modules += new /obj/item/multitool/cyborg(src)
-	modules += new /obj/item/gripper(src)
 	modules += new /obj/item/extinguisher/cyborg(src)
 	modules += new /obj/item/reagent_containers/spray/cleaner(src)
 	modules += new /obj/item/soap(src)
@@ -1170,9 +1147,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/drone/add_default_robot_items()
-	return
 
 /obj/item/robot_module/drone/respawn_consumable(mob/living/silicon/robot/R)
 	var/obj/item/reagent_containers/spray/cleaner/cleaner = locate() in modules
@@ -1203,7 +1177,6 @@
 	modules += new /obj/item/wrench/brass(src)
 	modules += new /obj/item/weldingtool/experimental/brass(src)
 	modules += new /obj/item/multitool/brass(src)
-	modules += new /obj/item/gripper/cogscarab(src)
 	modules += new /obj/item/stack/sheet/brass/cyborg(src)
 	modules += new /obj/item/clockwork/brassmaker(src)
 	modules += new /obj/item/extinguisher/cyborg(src)
@@ -1211,9 +1184,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/cogscarab/add_default_robot_items()
-	return
 
 /obj/item/robot_module/cogscarab/respawn_consumable(mob/living/silicon/robot/R)
 	return
@@ -1250,7 +1220,6 @@
 	modules += new /obj/item/crowbar/brass(src)
 	modules += new /obj/item/wirecutters/brass(src)
 	modules += new /obj/item/multitool/brass(src)
-	modules += new /obj/item/gripper/cogscarab(src)
 	modules += new /obj/item/t_scanner(src)
 	modules += new /obj/item/stack/sheet/brass/cyborg(src)
 	modules += new /obj/item/clockwork/brassmaker(src)
@@ -1259,9 +1228,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/clockwork/add_default_robot_items()
-	return
 
 /obj/item/robot_module/clockwork/respawn_consumable(mob/living/silicon/robot/R)
 	return
@@ -1310,8 +1276,6 @@
 	modules += new /obj/item/handheld_defibrillator(src)
 	modules += new /obj/item/twohanded/shockpaddles/borg(src)
 	modules += new /obj/item/restraints/handcuffs/cable/zipties(src)
-	modules += new /obj/item/gripper/universal(src)
-	modules += new /obj/item/flash/cyborg(src)
 	modules += new /obj/item/scalpel/laser/laser1(src)
 	modules += new /obj/item/hemostat(src)
 	modules += new /obj/item/retractor(src)
@@ -1340,9 +1304,6 @@
 
 	fix_modules()
 	handle_storages()
-
-/obj/item/robot_module/ninja/add_default_robot_items()
-	return
 
 //checks whether this item is a module of the robot it is located in.
 /obj/item/proc/is_robot_module()
